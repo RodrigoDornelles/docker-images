@@ -22,7 +22,7 @@ RUN apt-get -y install default-jre plantuml
 ENV PLANTUML_JAR_PATH=/usr/share/plantuml
 
 # install latex
-RUN apt-get -y install texlive-latex-base texlive-fonts-recommended texlive-fonts-extra
+RUN apt-get -y install texlive-latex-base texlive-fonts-recommended
 
 # clear cache
 RUN apt-get clean
