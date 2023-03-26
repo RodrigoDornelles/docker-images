@@ -5,8 +5,7 @@ FROM busybox as fetch
 ARG ZIG_VERSION=0.10.0
 
 RUN mkdir -p /zig
-RUN echo -e "VERSION: $ZIG_VERSION\nARCH: $(uname -m)"
-RUN wget -qOzig.tar.xz --user-agent "Mozilla/5.0 (X11; Linux $(uname -m)) AppleWebKit/537.22 (KHTML, like Gecko) Ubuntu Chromium/25.0.1364.160 Chrome/25.0.1364.160 Safari/537.22" "http://ziglang.org/download/$ZIG_VERSION/zig-linux-$(uname -m)-$ZIG_VERSION.tar.xz"
+RUN wget -qOzig.tar.xz --user-agent "http://ziglang.org/download/$ZIG_VERSION/zig-linux-$(uname -m)-$ZIG_VERSION.tar.xz"
 RUN tar xf zig.tar.xz -C /zig --strip-components=1
 
 FROM ${ZIG_BASE_IMAGE}
