@@ -5,7 +5,7 @@ FROM busybox as fetch
 ARG ZIG_VERSION=0.10.0
 
 RUN mkdir -p /zig
-RUN wget -qOzig.tar.xz --user-agent "http://ziglang.org/download/$ZIG_VERSION/zig-linux-$(uname -m)-$ZIG_VERSION.tar.xz"
+RUN wget -qOzig.tar.xz --random-wait "http://ziglang.org/download/$ZIG_VERSION/zig-linux-$(uname -m)-$ZIG_VERSION.tar.xz"
 RUN tar xf zig.tar.xz -C /zig --strip-components=1
 
 FROM ${ZIG_BASE_IMAGE}
