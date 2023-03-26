@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'ziglang/*'
+      - '.github/workflows/ziglang.yml'
 
 env:
   ZIG_LATEST: '0.10.1'
@@ -69,7 +70,7 @@ jobs:
           push: true
           tags: rodrigodornelles/ziglang:${{ matrix.version }}
           platforms: >
-            linux/386,linux/amd64,linux/arm/v5,linux/arm/v6,linux/arm/v7,linux/arm64/v8,
+            linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,
             linux/riscv64,linux/ppc64le,linux/s390x
           build-args: |
             ZIG_VERSION=${{ matrix.version }}
@@ -99,7 +100,7 @@ jobs:
           push: true
           tags: rodrigodornelles/ziglang:latest
           platforms: >
-            linux/386,linux/amd64,linux/arm/v5,linux/arm/v6,linux/arm/v7,linux/arm64/v8,
+            linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,
             linux/riscv64,linux/ppc64le,linux/s390x
           build-args: |
             ZIG_VERSION=${{ env.ZIG_LATEST }}
