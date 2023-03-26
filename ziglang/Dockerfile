@@ -1,6 +1,6 @@
 ARG ZIG_BASE_IMAGE=scratch
 
-FROM busybox:1.36.0-musl as fetch
+FROM busybox as fetch
 
 ARG ZIG_VERSION=0.10.0
 
