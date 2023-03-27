@@ -10,7 +10,7 @@
 
 ### Tags
 
-`rodrigodornelles/busybox:latest`
+`rodrigodornelles/doxygen:latest`
 
 ### Usage ###
 
