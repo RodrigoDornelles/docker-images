@@ -21,6 +21,9 @@ RUN apt-get -y install graphviz
 RUN apt-get -y install default-jre plantuml
 ENV PLANTUML_JAR_PATH=/usr/share/plantuml
 
+# install ruby
+RUN apt-get -y install ruby
+
 # install latex
 RUN apt-get -y install texlive-latex-base texlive-fonts-recommended
 
