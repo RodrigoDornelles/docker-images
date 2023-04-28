@@ -4,7 +4,7 @@ ENV SAMPSDK_DIR=/usr/local/share/sampsdk
 ENV SAMPGDK_DIR=/usr/local/share/sampgdk
 
 RUN apt-get -y update && \
-    apt-get -y install python2-minimal curl python-ply gcc gcc-multilib g++ g++-multilib cmake && \
+    apt-get -y install git python2-minimal curl python-ply gcc gcc-multilib g++ g++-multilib cmake && \
     mkdir -p /usr/local/share/sampsdk && \
     mkdir -p /sampgdk/build && \
     mkdir -p /pawno/pawnlib && \
