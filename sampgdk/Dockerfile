@@ -28,8 +28,8 @@ RUN apt-get -y update && \
     mv /pawno/include/*.inc /usr/include && \
     mv /sampgdk/cmake/*.cmake /usr/share/cmake-3.18/Modules && \
     mv /pawno/source/linux/*.h /usr/local/include && \
-    ln -s /usr/local/lib/libsampgdk.so /usr/lib32 && \
-    ln -s /usr/local/lib/libsampgdk.so.4 /usr/lib32 && \
+    ln -s /usr/local/lib/libsampgdk.so /usr/lib && \
+    ln -s /usr/local/lib/libsampgdk.so.4 /usr/lib && \
     rm -Rf /var/lib/apt/lists/* && \
     chmod +x /usr/local/bin/samp && \
     chmod +x /entrypoint.sh && \
