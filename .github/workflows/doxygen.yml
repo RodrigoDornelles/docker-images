@@ -8,6 +8,7 @@ on:
 
 env:
   REGISTRY_IMAGE: rodrigodornelles/doxygen
+  CONTEXT: doxygen
 
 jobs:
   build:
@@ -53,7 +54,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ${{ env.CONTEXT }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
