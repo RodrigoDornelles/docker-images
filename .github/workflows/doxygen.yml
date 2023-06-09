@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - linux/i368
+          - linux/368
           - linux/amd64
           - linux/arm/v5
           - linux/arm/v6
