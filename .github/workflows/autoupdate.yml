@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: main
 
       - name: Get latest releases
         id: latest-releases
@@ -28,6 +30,8 @@ jobs:
           sed -i "s#github.com/plantuml/plantuml/releases/download/.*#github.com/plantuml/plantuml/releases/download/${{ steps.latest-releases.outputs.plantuml_version }}#" ./doxygen/Dockerfile
           
           if [ -n "$(git status -s)" ]; then
+            git config user.name "${{ secrets.GIT_USER_NAME}}"
+            git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
             git push
