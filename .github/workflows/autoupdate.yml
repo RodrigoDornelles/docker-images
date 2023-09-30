@@ -4,8 +4,8 @@ on:
   schedule:
     - cron: '0 0 * * 0'
   push:
-    branches:
-    - develop
+    paths:
+      - '.github/workflows/autoupdate.yml'
 
 jobs:
   doxygen:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: develop
+          ref: main
 
       - name: Update Dockerfile with latest releases
         run: |
@@ -25,7 +25,7 @@ jobs:
           sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" ./doxygen/Dockerfile
           sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" ./doxygen/Dockerfile
 
-      - name: Push new version to github
+      - name: Push new versions to github
         run: |
           git diff
           if [ -n "$(git status -s)" ]; then
@@ -33,7 +33,7 @@ jobs:
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
-            echo "git push"
+            git push
           else
             echo "Dockerfile is up to date."
           fi
