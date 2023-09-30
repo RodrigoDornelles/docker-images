@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0'
+  push:
+    branches:
+    - develop
 
 jobs:
   doxygen:
@@ -11,27 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: main
+          ref: develop
 
-      - name: Get latest releases
-        id: latest-releases
+      - name: Update Dockerfile with latest releases
         run: |
-          echo "doxygen_version=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | jq -r '.tag_name')" >> $GITHUB_OUTPUT
-          echo "awesome_css_version=$(curl -s https://api.github.com/repos/jothepro/doxygen-awesome-css/releases/latest | jq -r '.tag_name')" >> $GITHUB_OUTPUT
-          echo "plantuml_version=$(curl -s https://api.github.com/repos/plantuml/plantuml/releases/latest | jq -r '.tag_name')" >> $GITHUB_OUTPUT
-    
-      - name: Update Dockerfile
+          DOXYGEN_VERSION=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | jq -r '.tag_name')
+          AWESOME_VERSION=$(curl -s https://api.github.com/repos/jothepro/doxygen-awesome-css/releases/latest | jq -r '.tag_name')
+          PLANTUML_VERSION=$(curl -s https://api.github.com/repos/plantuml/plantuml/releases/latest | jq -r '.tag_name')
+
+          sed -i "s/ARG DOXYGEN_VERSION=.*/ARG DOXYGEN_VERSION=$DOXYGEN_VERSION/" Dockerfile
+          sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" Dockerfile
+          sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" Dockerfile
+
+      - name: Push new version to github
         run: |
-          sed -i "s#github.com/doxygen/doxygen/releases/download/.*#github.com/doxygen/doxygen/releases/download/${{ steps.latest-releases.outputs.doxygen_version }}#" ./doxygen/Dockerfile
-          sed -i "s#github.com/jothepro/doxygen-awesome-css/releases/download/.*#github.com/jothepro/doxygen-awesome-css/releases/download/${{ steps.latest-releases.outputs.awesome_css_version }}#" ./doxygen/Dockerfile
-          sed -i "s#github.com/plantuml/plantuml/releases/download/.*#github.com/plantuml/plantuml/releases/download/${{ steps.latest-releases.outputs.plantuml_version }}#" ./doxygen/Dockerfile
-          
+          git diff
           if [ -n "$(git status -s)" ]; then
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
-            git push
+            echo "git push"
           else
             echo "Dockerfile is up to date."
           fi
