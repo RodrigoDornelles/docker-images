@@ -21,10 +21,9 @@ jobs:
           DOXYGEN_VERSION=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | jq -r '.tag_name')
           AWESOME_VERSION=$(curl -s https://api.github.com/repos/jothepro/doxygen-awesome-css/releases/latest | jq -r '.tag_name')
           PLANTUML_VERSION=$(curl -s https://api.github.com/repos/plantuml/plantuml/releases/latest | jq -r '.tag_name')
-
-          sed -i "s/ARG DOXYGEN_VERSION=.*/ARG DOXYGEN_VERSION=$DOXYGEN_VERSION/" Dockerfile
-          sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" Dockerfile
-          sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" Dockerfile
+          sed -i "s/ARG DOXYGEN_VERSION=.*/ARG DOXYGEN_VERSION=$DOXYGEN_VERSION/" ./doxygen/Dockerfile
+          sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" ./doxygen/Dockerfile
+          sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" ./doxygen/Dockerfile
 
       - name: Push new version to github
         run: |
