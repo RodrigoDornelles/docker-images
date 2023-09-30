@@ -1,0 +1,39 @@
+name: auto update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+  push:
+    paths:
+      - '.github/workflows/autoupdate.yml'
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Update Dockerfile with latest releases
+        run: |
+          DOXYGEN_VERSION=$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | jq -r '.tag_name')
+          AWESOME_VERSION=$(curl -s https://api.github.com/repos/jothepro/doxygen-awesome-css/releases/latest | jq -r '.tag_name')
+          PLANTUML_VERSION=$(curl -s https://api.github.com/repos/plantuml/plantuml/releases/latest | jq -r '.tag_name')
+          sed -i "s/ARG DOXYGEN_VERSION=.*/ARG DOXYGEN_VERSION=$DOXYGEN_VERSION/" ./doxygen/Dockerfile
+          sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" ./doxygen/Dockerfile
+          sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" ./doxygen/Dockerfile
+
+      - name: Push new versions to github
+        run: |
+          git diff
+          if [ -n "$(git status -s)" ]; then
+            git config user.name "${{ secrets.GIT_USER_NAME}}"
+            git config user.email "${{ secrets.GIT_USER_MAIL}}"
+            git add ./doxygen/Dockerfile
+            git commit -m "build: automatic update doxygen"
+            git push
+          else
+            echo "Dockerfile is up to date."
+          fi
