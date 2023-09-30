@@ -1,0 +1,33 @@
+name: auto update
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get latest releases
+        id: latest-releases
+        run: |
+          echo "::set-output name=doxygen_version::$(curl -s https://api.github.com/repos/doxygen/doxygen/releases/latest | jq -r '.tag_name')"
+          echo "::set-output name=awesome_css_version::$(curl -s https://api.github.com/repos/jothepro/doxygen-awesome-css/releases/latest | jq -r '.tag_name')"
+          echo "::set-output name=plantuml_version::$(curl -s https://api.github.com/repos/plantuml/plantuml/releases/latest | jq -r '.tag_name')"
+
+      - name: Update Dockerfile
+        run: |
+          sed -i "s#github.com/doxygen/doxygen/releases/download/.*#github.com/doxygen/doxygen/releases/download/${{ steps.latest-releases.outputs.doxygen_version }}#" ./doxygen/Dockerfile
+          sed -i "s#github.com/jothepro/doxygen-awesome-css/releases/download/.*#github.com/jothepro/doxygen-awesome-css/releases/download/${{ steps.latest-releases.outputs.awesome_css_version }}#" ./doxygen/Dockerfile
+          sed -i "s#github.com/plantuml/plantuml/releases/download/.*#github.com/plantuml/plantuml/releases/download/${{ steps.latest-releases.outputs.plantuml_version }}#" ./doxygen/Dockerfile
+
+          if [ -n "$(git status -s)" ]; then
+            git add Dockerfile
+            git commit -m "build: automatic update doxygen with latest releases."
+            git push
+          else
+            echo "Dockerfile is up to date."
+          fi
