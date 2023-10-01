@@ -25,15 +25,43 @@ jobs:
           sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" ./doxygen/Dockerfile
           sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" ./doxygen/Dockerfile
 
-      - name: Push new versions to github
+      - name: Commit to new branch
+        id: condition
         run: |
           git diff
-          if [ -n "$(git status -s)" ]; then
+          BRANCH = $(git hash-object ./doxygen/dockerfile | head -c 7)
+
+          if git rev-parse --verify "$branch_name" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+            echo "should_open_pr=true" >> $GITHUB_OUTPUT
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
-            git push
+            git checkout -b $BRANCH
+            git push -u
           else
+            echo "should_open_pr=false" >> $GITHUB_OUTPUT
             echo "Dockerfile is up to date."
           fi
+
+      - name: Open Pull Request
+        if: steps.condition.outputs.should_open_pr == 'true'
+        run: |
+          TOKEN=$PAT_TOKEN  # Use o nome do segredo que você adicionou
+          TITLE="Auto Commit Pull Request"
+          BODY="This pull request was automatically created by a GitHub Action."
+          REPO_OWNER="yourusername"
+          REPO_NAME="yourrepositoryname"
+          BASE_BRANCH="main"  # Substitua pela branch de destino
+          HEAD_BRANCH="new-branch"  # Substitua pelo nome da branch desejada
+          
+          response=$(curl -s -X POST -H "Authorization: token $TOKEN" -d \
+          "{
+            \"title\": \"$TITLE\",
+            \"body\": \"$BODY\",
+            \"head\": \"$REPO_OWNER:$HEAD_BRANCH\",
+            \"base\": \"$BASE_BRANCH\"
+          }" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls")
+          
+          PR_URL=$(echo "$response" | jq -r .html_url)
+          echo "Created Pull Request: $PR_URL"
