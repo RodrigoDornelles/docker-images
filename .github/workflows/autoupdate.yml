@@ -31,7 +31,7 @@ jobs:
           git diff
           branch="auto-$(git hash-object ./doxygen/Dockerfile | head -c 7))"
 
-          if git rev-parse --verify "$branch" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+          if ! git rev-parse --verify "$branch" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
             echo "should_open_pr=$branch" >> $GITHUB_OUTPUT
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
