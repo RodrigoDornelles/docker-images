@@ -25,15 +25,36 @@ jobs:
           sed -i "s/ARG AWESOME_VERSION=.*/ARG AWESOME_VERSION=$AWESOME_VERSION/" ./doxygen/Dockerfile
           sed -i "s/ARG PLANTUML_VERSION=.*/ARG PLANTUML_VERSION=$PLANTUML_VERSION/" ./doxygen/Dockerfile
 
-      - name: Push new versions to github
+      - name: Commit to new branch
+        id: condition
         run: |
           git diff
-          if [ -n "$(git status -s)" ]; then
+          branch="auto-$(git hash-object ./doxygen/Dockerfile | head -c 7)"
+
+          if ! git rev-parse --verify "$branch" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+            echo "should_open_pr=$branch" >> $GITHUB_OUTPUT
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
-            git push
+            git checkout -b $branch
+            git push --set-upstream origin $branch
           else
+            echo "should_open_pr=false" >> $GITHUB_OUTPUT
             echo "Dockerfile is up to date."
           fi
+
+      - name: Open Pull Request
+        continue-on-error: true 
+        if: steps.condition.outputs.should_open_pr != 'false'
+        run: |
+          response=$(curl -s -X POST -H "Authorization: token ${{ secrets.GIT_USER_TOKEN }}" -d \
+          "{
+            \"title\": \"doxygen update [autocommit]\",
+            \"body\": \"check latest updates\",
+            \"head\": \"rodrigodornelles:${{ steps.condition.outputs.should_open_pr }}\",
+            \"base\": \"main\"
+          }" "https://api.github.com/repos/rodrigodornelles/docker-images/pulls")
+          
+          PR_URL=$(echo "$response" | jq -r .html_url)
+          echo "Created Pull Request: $PR_URL"
