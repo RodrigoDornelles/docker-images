@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: main
+          ref: test
 
       - name: Update Dockerfile with latest releases
         run: |
@@ -29,10 +29,10 @@ jobs:
         id: condition
         run: |
           git diff
-          BRANCH = $(git hash-object ./doxygen/dockerfile | head -c 7)
+          BRANCH = $(git hash-object ./doxygen/Dockerfile | head -c 7)
 
-          if git rev-parse --verify "$branch_name" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
-            echo "should_open_pr=true" >> $GITHUB_OUTPUT
+          if git rev-parse --verify "$BRANCH" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+            echo "should_open_pr=$BRANCH" >> $GITHUB_OUTPUT
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
@@ -45,23 +45,15 @@ jobs:
           fi
 
       - name: Open Pull Request
-        if: steps.condition.outputs.should_open_pr == 'true'
+        if: steps.condition.outputs.should_open_pr != 'false'
         run: |
-          TOKEN=$PAT_TOKEN  # Use o nome do segredo que você adicionou
-          TITLE="Auto Commit Pull Request"
-          BODY="This pull request was automatically created by a GitHub Action."
-          REPO_OWNER="yourusername"
-          REPO_NAME="yourrepositoryname"
-          BASE_BRANCH="main"  # Substitua pela branch de destino
-          HEAD_BRANCH="new-branch"  # Substitua pelo nome da branch desejada
-          
-          response=$(curl -s -X POST -H "Authorization: token $TOKEN" -d \
+          response=$(curl -s -X POST -H "Authorization: token ${{ secrets.GIT_USER_TOKEN }}" -d \
           "{
-            \"title\": \"$TITLE\",
-            \"body\": \"$BODY\",
-            \"head\": \"$REPO_OWNER:$HEAD_BRANCH\",
-            \"base\": \"$BASE_BRANCH\"
-          }" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls")
+            \"title\": \"doxygen update [autocommit]\",
+            \"body\": \"check latest updates\",
+            \"head\": \"rodrigodornelles:${{ steps.condition.outputs.should_open_pr }}\",
+            \"base\": \"test\"
+          }" "https://api.github.com/repos/rodrigodornelles/docker-images/pulls")
           
           PR_URL=$(echo "$response" | jq -r .html_url)
           echo "Created Pull Request: $PR_URL"
