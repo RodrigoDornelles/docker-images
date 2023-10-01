@@ -29,15 +29,15 @@ jobs:
         id: condition
         run: |
           git diff
-          BRANCH = $(git hash-object ./doxygen/Dockerfile | head -c 7)
+          branch="auto-$(git hash-object ./doxygen/Dockerfile | head -c 7))
 
-          if git rev-parse --verify "$BRANCH" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
-            echo "should_open_pr=$BRANCH" >> $GITHUB_OUTPUT
+          if git rev-parse --verify "$branch" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+            echo "should_open_pr=$branch" >> $GITHUB_OUTPUT
             git config user.name "${{ secrets.GIT_USER_NAME}}"
             git config user.email "${{ secrets.GIT_USER_MAIL}}"
             git add ./doxygen/Dockerfile
             git commit -m "build: automatic update doxygen"
-            git checkout -b $BRANCH
+            git checkout -b $branch
             git push -u
           else
             echo "should_open_pr=false" >> $GITHUB_OUTPUT
