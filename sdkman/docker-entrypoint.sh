@@ -1,7 +1,15 @@
 #!/bin/bash
 set -e
 
-source /root/.bashrc
-source $SDKMAN_DIR/bin/sdkman-init.sh
+mkdir -p /tmp/android /tmp/sdkman-tmp /tmp/sdkman-candidates
 
-exec "$@"
+if [[ ("$1" = 'sh' || "$1" = 'bash') && "$2" = "-c" ]]; then
+    shift 2
+    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && ($@)"
+elif [ $# -gt 0 ]; then
+    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && ($@)"
+else
+    source /root/.bashrc
+    source $SDKMAN_DIR/bin/sdkman-init.sh
+    exec bash
+fi
