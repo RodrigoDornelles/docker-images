@@ -1,7 +1,5 @@
 FROM debian:bullseye-slim
 
-COPY ./docker-entrypoint.sh /entrypoint.sh
-
 ENV SDKMAN_URL https://get.sdkman.io
 ENV ANDROID_URL https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
 ENV ANDROID_HOME /opt/android-sdk
@@ -22,7 +20,11 @@ RUN bash -c "source /root/.bashrc \
     && (yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME > /dev/null) \
     && sdk uninstall java 17.0.9-oracle --force \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*"
+    && rm -Rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.android $SDKMAN_DIR/candidates $SDKMAN_DIR/tmp \
+    && ln -s /tmp/android /root/.android \
+    && ln -s /tmp/sdkman-candidates $SDKMAN_DIR/candidates \
+    && ln -s /tmp/sdkman-tmp $SDKMAN_DIR/tmp \
+    "
 
+COPY ./docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash"]
