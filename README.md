@@ -61,6 +61,34 @@ podman run --rm -v $(pwd):/app -w /app rodrigodornelles/sampgdk:latest cmake -DS
  * `SAMPSDK_DIR`
  * `SAMPGDK_DIR`
 
+## SDKMAN ##
+
+[![sponsors](https://img.shields.io/github/sponsors/rodrigodornelles?color=ff69b4&logo=github)](https://github.com/sponsors/RodrigoDornelles)
+[![](https://img.shields.io/docker/pulls/rodrigodornelles/sdkman?logo=docker&logoColor=fff)](https://hub.docker.com/r/rodrigodornelles/sdkman)
+[![](https://img.shields.io/docker/image-size/rodrigodornelles/sdkman/latest?logo=docker&logoColor=fff)](https://hub.docker.com/r/rodrigodornelles/sdkman/tags)
+
+> an easy sdk manager to build java and android applications.
+
+### Tags
+
+`rodrigodornelles/sdkman:latest`
+
+### Features ###
+
+ * [sdkman](https://sdkman.io/)
+ * [advmangager](https://developer.android.com/studio/command-line/avdmanager)
+ * [android-sdk-tools](https://developer.android.com/studio#command-tools)
+
+### Usage ###
+
+```sh
+podman run --rm -v $(pwd):/app -w /app rodrigodornelles/sdkman:latest
+sdk install java 17.0.9-oracle
+sdk install gradle 8.4
+sdkmanager "build-tools;33.0.0" "platforms;android-33"
+gradle assembleRelease --daemon --parallel
+```
+
 ## ZigLang ##
 
 [![sponsors](https://img.shields.io/github/sponsors/rodrigodornelles?color=ff69b4&logo=github)](https://github.com/sponsors/RodrigoDornelles)
@@ -69,7 +97,12 @@ podman run --rm -v $(pwd):/app -w /app rodrigodornelles/sampgdk:latest cmake -DS
 
 ### Tags
 
-`rodrigodornelles/ziglang:latest` `rodrigodornelles/ziglang:0.10.1` `rodrigodornelles/ziglang:0.10.0` `rodrigodornelles/ziglang:0.9.1` `rodrigodornelles/ziglang:0.9.0` `rodrigodornelles/ziglang:0.8.1` `rodrigodornelles/ziglang:0.8.0` `rodrigodornelles/ziglang:0.7.1` `rodrigodornelles/ziglang:0.7.0` `rodrigodornelles/ziglang:0.6.0` `rodrigodornelles/ziglang:0.5.0` `rodrigodornelles/ziglang:0.4.0` `rodrigodornelles/ziglang:0.3.0` `rodrigodornelles/ziglang:0.2.0`  `rodrigodornelles/ziglang:0.10.1-alpine` `rodrigodornelles/ziglang:0.10.0-alpine` `rodrigodornelles/ziglang:0.9.1-alpine` `rodrigodornelles/ziglang:0.9.0-alpine` `rodrigodornelles/ziglang:0.8.1-alpine` `rodrigodornelles/ziglang:0.8.0-alpine` `rodrigodornelles/ziglang:0.7.1-alpine` `rodrigodornelles/ziglang:0.7.0-alpine` `rodrigodornelles/ziglang:0.6.0-alpine` `rodrigodornelles/ziglang:0.5.0-alpine` `rodrigodornelles/ziglang:0.4.0-alpine` `rodrigodornelles/ziglang:0.3.0-alpine` `rodrigodornelles/ziglang:0.2.0-alpine` `rodrigodornelles/ziglang:0.10.1-busybox` `rodrigodornelles/ziglang:0.10.0-busybox` `rodrigodornelles/ziglang:0.9.1-busybox` `rodrigodornelles/ziglang:0.9.0-busybox` `rodrigodornelles/ziglang:0.8.1-busybox` `rodrigodornelles/ziglang:0.8.0-busybox` `rodrigodornelles/ziglang:0.7.1-busybox` `rodrigodornelles/ziglang:0.7.0-busybox` `rodrigodornelles/ziglang:0.6.0-busybox` `rodrigodornelles/ziglang:0.5.0-busybox` `rodrigodornelles/ziglang:0.4.0-busybox` `rodrigodornelles/ziglang:0.3.0-busybox` `rodrigodornelles/ziglang:0.2.0-busybox` `rodrigodornelles/ziglang:0.10.1-debian` `rodrigodornelles/ziglang:0.10.0-debian` `rodrigodornelles/ziglang:0.9.1-debian` `rodrigodornelles/ziglang:0.9.0-debian` `rodrigodornelles/ziglang:0.8.1-debian` `rodrigodornelles/ziglang:0.8.0-debian` `rodrigodornelles/ziglang:0.7.1-debian` `rodrigodornelles/ziglang:0.7.0-debian` `rodrigodornelles/ziglang:0.6.0-debian` `rodrigodornelles/ziglang:0.5.0-debian` `rodrigodornelles/ziglang:0.4.0-debian` `rodrigodornelles/ziglang:0.3.0-debian` `rodrigodornelles/ziglang:0.2.0-debian`
+`rodrigodornelles/ziglang:latest` `rodrigodornelles/ziglang:<version>` `rodrigodornelles/ziglang:<version>-<distro>`
+
+| architeture | `<version>` | `<distro>` |
+| :---------- | :---------: | :--------: |
+| amd64 | `0.10.0` `0.9.1` `0.9.0` `0.8.1` `0.8.0` | `busybox` `alpine` `debian` |
+| amd64 |  `0.7.1` `0.7.0` `0.6.0` `0.5.0` `0.4.0` `0.3.0` `0.2.0` | `busybox` `alpine` `debian` |
 
 ### Usage ###
 
