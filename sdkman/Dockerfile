@@ -8,7 +8,7 @@ ENV PATH $PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOM
 
 RUN bash -c "source /root/.bashrc \
     && apt-get -y update \
-    && apt-get -y install curl zip unzip git \
+    && apt-get -y install curl zip unzip git libncurses5 cmake make \
     && curl -s $SDKMAN_URL | bash \
     && source $SDKMAN_DIR/bin/sdkman-init.sh \
     && sdk install java 17.0.9-oracle \
