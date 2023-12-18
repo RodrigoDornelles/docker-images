@@ -5,6 +5,7 @@ ENV ANDROID_URL https://dl.google.com/android/repository/commandlinetools-linux-
 ENV ANDROID_HOME /opt/android-sdk
 ENV SDKMAN_DIR /opt/sdkman
 ENV PATH $PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/bin
+ENV TMPDIR_PATH /tmp/android:/tmp/sdkman-tmp:/tmp/sdkman-candidates
 
 RUN bash -c "source /root/.bashrc \
     && apt-get -y update \
