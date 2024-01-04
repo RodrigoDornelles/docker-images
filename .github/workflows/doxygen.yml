@@ -3,8 +3,11 @@ name: doxygen
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'doxygen/*'
+      - '!doxygen/README.md'
       - '.github/workflows/doxygen.yml'
 
 env:
