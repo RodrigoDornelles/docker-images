@@ -23,7 +23,8 @@ COPY --from=fetch /plantuml /usr/share/plantuml
 COPY --from=fetch /doxygen-source /doxygen-source
 COPY --from=fetch /doxygen-awesome-css /doxygen-awesome-css
 
-RUN apt-get -y update && \
+RUN set -ex && \
+    apt-get -y update && \
     apt-get -y install cmake && \
     apt-get -y install ruby make graphviz default-jre texlive-latex-extra && \
     make install -C /doxygen-source && \
