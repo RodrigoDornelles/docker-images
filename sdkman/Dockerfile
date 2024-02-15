@@ -19,7 +19,7 @@ ENV TMPDIR_PATH $TMPDIR_PATH:/tmp/bin
 
 RUN bash -c "source /root/.bashrc \
     && apt-get -y update \
-    && apt-get -y install curl zip unzip git libncurses5 cmake make \
+    && apt-get -y install curl zip unzip git libncurses5 cmake make file \
     && mkdir -p $FVM_DIR \
     && curl -SL ${FVM_URL}/${FVM_VER}/fvm-${FVM_VER}-linux-${FVM_ARCH}.tar.gz -o ${FVM_DIR}/fvm.tar.gz \
     && tar -xvf ${FVM_DIR}/fvm.tar.gz -C $FVM_DIR --strip-components 1 \
