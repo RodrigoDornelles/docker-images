@@ -8,6 +8,7 @@
 ### Tags
 
 `rodrigodornelles/doxygen:latest`
+`rodrigodornelles/doxygen:lua`
 
 ### Usage ###
 

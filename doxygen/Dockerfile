@@ -26,7 +26,7 @@ COPY --from=fetch /doxygen-awesome-css /doxygen-awesome-css
 RUN set -ex && \
     apt-get -y update && \
     apt-get -y install cmake && \
-    apt-get -y install ruby make graphviz default-jre texlive-latex-extra && \
+    apt-get -y install make graphviz default-jre texlive-latex-extra && \
     make install -C /doxygen-source && \
     make install -C /doxygen-awesome-css && \
     apt-get -y remove cmake && \
@@ -34,3 +34,27 @@ RUN set -ex && \
     rm -Rf /doxygen-awesome-css && \
     rm -Rf /var/lib/apt/lists/* && \
     apt-get clean
+
+ARG version=''
+
+RUN [ "${version}" != "lua" ] \
+    && echo "RUN: skiped lua!" \
+    || (\
+        set -ex \
+        && apt-get -y update \
+        && apt-get -y install cpanminus  \
+        && apt-get -y install lua5.1 luarocks \
+        && mkdir -p /doxygen-lua2dox \
+        && wget -O /doxygen-lua2dox/doxygen.zip "https://github.com/alecchen/doxygen-lua/archive/refs/heads/master.zip" \
+        && cd /doxygen-lua2dox \
+        && unzip doxygen.zip \
+        && cd /doxygen-lua2dox/doxygen-lua-master \
+        && cpanm Module::Install \
+        && perl Makefile.PL \
+        && make \
+        && make install \
+        && apt-get -y remove cpanminus \
+        && rm -Rf /doxygen-lua2dox \
+        && rm -Rf /var/lib/apt/lists/* \
+        && apt-get clean \
+    )
