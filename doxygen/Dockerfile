@@ -43,7 +43,7 @@ RUN [ "${version}" != "lua" ] \
         set -ex \
         && apt-get -y update \
         && apt-get -y install cpanminus  \
-        && apt-get -y install lua5.1 luarocks \
+        && apt-get -y install lua5.3 luarocks \
         && mkdir -p /doxygen-lua2dox \
         && wget -O /doxygen-lua2dox/doxygen.zip "https://github.com/alecchen/doxygen-lua/archive/refs/heads/master.zip" \
         && cd /doxygen-lua2dox \
