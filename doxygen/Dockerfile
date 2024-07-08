@@ -2,7 +2,7 @@ FROM debian:bullseye-slim as fetch
 
 ARG DOXYGEN_VERSION=Release_1_11_0
 ARG AWESOME_VERSION=v2.3.3
-ARG PLANTUML_VERSION=v1.2024.5
+ARG PLANTUML_VERSION=v1.2024.6
 
 RUN apt-get -y update && apt-get -y install cmake g++ gcc python flex bison curl
 RUN mkdir -p /doxygen-source && mkdir -p /doxygen-awesome-css && mkdir -p /plantuml
@@ -43,7 +43,7 @@ RUN [ "${version}" != "lua" ] \
         set -ex \
         && apt-get -y update \
         && apt-get -y install cpanminus  \
-        && apt-get -y install lua5.1 luarocks \
+        && apt-get -y install lua5.3 luarocks \
         && mkdir -p /doxygen-lua2dox \
         && wget -O /doxygen-lua2dox/doxygen.zip "https://github.com/alecchen/doxygen-lua/archive/refs/heads/master.zip" \
         && cd /doxygen-lua2dox \
