@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim as fetch
+FROM debian:bullseye-20240812-slim as fetch
 
 ARG DOXYGEN_VERSION=Release_1_12_0
 ARG AWESOME_VERSION=v2.3.3
