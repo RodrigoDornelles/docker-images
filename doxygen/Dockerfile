@@ -14,7 +14,7 @@ RUN curl -fsSL "https://github.com/plantuml/plantuml/releases/download/$PLANTUML
 WORKDIR /doxygen-source
 RUN cmake -G "Unix Makefiles" . && make
 
-FROM debian:bullseye-slim
+FROM debian:bullseye-20240812-slim
 
 ENV DOXYGEN_AWESOME_PATH=/usr/local/share/doxygen-awesome-css
 ENV PLANTUML_JAR_PATH=/usr/share/plantuml
