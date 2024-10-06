@@ -1,7 +1,7 @@
 FROM debian:bullseye-20240812-slim as fetch
 
 ARG DOXYGEN_VERSION=Release_1_12_0
-ARG AWESOME_VERSION=v2.3.3
+ARG AWESOME_VERSION=v2.3.4
 ARG PLANTUML_VERSION=v1.2024.7
 
 RUN apt-get -y update && apt-get -y install cmake g++ gcc python flex bison curl
