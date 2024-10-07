@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bullseye-20240812-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH=/opt/devkitpro/pacman/bin:${PATH}
@@ -7,8 +7,8 @@ ENV DEVKITARM=/opt/devkitpro/devkitARM
 ENV DEVKITPPC=/opt/devkitpro/devkitPPC
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y build-essential cmake git wget unzip python3 python3-pip \
+    && apt-get -y update \
+    && apt-get -y install --no-install-recommends cmake git wget unzip python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
@@ -23,4 +23,7 @@ RUN set -ex \
 ARG videogame
 RUN set -ex \
     && pacman -Sy --noconfirm \
-    && pacman -S --noconfirm ${videogame}-dev
+    && pacman -S --noconfirm ${videogame}-dev \
+    && pacman -Scc --noconfirm \
+    && rm -rf /var/lib/pacman/sync/*
+
