@@ -1,0 +1,124 @@
+name: devkitpro
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'devkitpro/*'
+      - '!devkitpro/README.md'
+      - '.github/workflows/devkitpro.yml'
+
+env:
+  REGISTRY_IMAGE: rodrigodornelles/devkitpro
+  CONTEXT: devkitpro
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/aarch64
+        version:
+          - gba
+          - nds
+          - 3ds
+          - gamecube
+          - wii
+          - wiiu
+          - switch
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{ env.CONTEXT }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          build-args: videogame=${{ matrix.version }}
+      -
+        name: Export digest
+        run: |
+          mkdir -p /tmp/digests-${{ matrix.version }}
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests-${{ matrix.version }}/${digest#sha256:}"
+      -
+        name: Upload digest
+        uses: actions/upload-artifact@v3
+        with:
+          name: digests-${{ matrix.version }}
+          path: /tmp/digests-${{ matrix.version }}/*
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - gba
+          - nds
+          - 3ds
+          - gamecube
+          - wii
+          - wiiu
+          - switch
+
+    needs:
+      - build
+    steps:
+      -
+        name: Download digests
+        uses: actions/download-artifact@v3
+        with:
+          name: digests-${{ matrix.version }}
+          path: /tmp/digests-${{ matrix.version }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Create manifest list and push
+        working-directory: /tmp/digests-${{ matrix.version }}
+        run: |
+          docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${{ matrix.version }} $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
