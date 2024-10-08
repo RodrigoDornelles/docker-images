@@ -8,7 +8,7 @@ ENV DEVKITPPC=/opt/devkitpro/devkitPPC
 
 RUN set -ex \
     && apt-get -y update \
-    && apt-get -y install --no-install-recommends cmake git wget unzip python3 python3-pip \
+    && apt-get -y install --no-install-recommends cmake clang musl-dev git wget unzip python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
