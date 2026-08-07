@@ -1,8 +1,8 @@
 FROM debian:bullseye-20240812-slim as fetch
 
-ARG DOXYGEN_VERSION=Release_1_13_2
-ARG AWESOME_VERSION=v2.3.4
-ARG PLANTUML_VERSION=v1.2025.0
+ARG DOXYGEN_VERSION=Release_1_17_0
+ARG AWESOME_VERSION=v2.4.2
+ARG PLANTUML_VERSION=v1.2026.6
 
 RUN apt-get -y update && apt-get -y install cmake g++ gcc python flex bison curl
 RUN mkdir -p /doxygen-source && mkdir -p /doxygen-awesome-css && mkdir -p /plantuml
