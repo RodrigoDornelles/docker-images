@@ -1,10 +1,11 @@
-FROM debian:bullseye-20240812-slim AS fetch
+FROM debian:bookworm-slim AS fetch
 
 ARG DOXYGEN_VERSION=Release_1_17_0
 ARG AWESOME_VERSION=v2.4.2
 ARG PLANTUML_VERSION=v1.2026.6
 
-RUN apt-get -y update && apt-get -y install cmake g++ gcc python flex bison curl
+RUN apt-get -y update && apt-get -y install cmake g++ gcc python3 flex bison curl
+
 RUN mkdir -p /doxygen-source && mkdir -p /doxygen-awesome-css && mkdir -p /plantuml
 
 RUN curl -fsSL "https://github.com/doxygen/doxygen/archive/refs/tags/$DOXYGEN_VERSION.tar.gz" | tar xvz -C /doxygen-source --strip-components=1
@@ -14,7 +15,7 @@ RUN curl -fsSL "https://github.com/plantuml/plantuml/releases/download/$PLANTUML
 WORKDIR /doxygen-source
 RUN cmake -G "Unix Makefiles" . && make
 
-FROM debian:bullseye-20240812-slim
+FROM debian:bookworm-slim
 
 ENV DOXYGEN_AWESOME_PATH=/usr/local/share/doxygen-awesome-css
 ENV PLANTUML_JAR_PATH=/usr/share/plantuml
@@ -30,6 +31,7 @@ RUN set -ex && \
     make install -C /doxygen-source && \
     make install -C /doxygen-awesome-css && \
     apt-get -y remove cmake && \
+    apt-get -y autoremove && \
     rm -Rf /doxygen-source && \
     rm -Rf /doxygen-awesome-css && \
     rm -Rf /var/lib/apt/lists/* && \
@@ -39,10 +41,10 @@ ARG version=''
 
 RUN [ "${version}" != "lua" ] \
     && echo "RUN: skiped lua!" \
-    || (\
+    || ( \
         set -ex \
         && apt-get -y update \
-        && apt-get -y install cpanminus  \
+        && apt-get -y install cpanminus \
         && apt-get -y install lua5.3 luarocks \
         && mkdir -p /doxygen-lua2dox \
         && wget -O /doxygen-lua2dox/doxygen.zip "https://github.com/alecchen/doxygen-lua/archive/refs/heads/master.zip" \
@@ -54,7 +56,8 @@ RUN [ "${version}" != "lua" ] \
         && make \
         && make install \
         && apt-get -y remove cpanminus \
+        && apt-get -y autoremove \
         && rm -Rf /doxygen-lua2dox \
         && rm -Rf /var/lib/apt/lists/* \
         && apt-get clean \
-    )
+)
