@@ -21,15 +21,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - linux/386
-          - linux/amd64
-          - linux/arm/v5
-          - linux/arm/v7
-          - linux/arm64/v8
-          - linux/mips64le
-          - linux/ppc64le
-          - linux/s390x
+        include:
+          - platform: linux/386
+            platform_name: linux-386
+          - platform: linux/amd64
+            platform_name: linux-amd64
+          - platform: linux/arm/v5
+            platform_name: linux-arm-v5
+          - platform: linux/arm/v7
+            platform_name: linux-arm-v7
+          - platform: linux/arm64/v8
+            platform_name: linux-arm64-v8
+          - platform: linux/mips64le
+            platform_name: linux-mips64le
+          - platform: linux/ppc64le
+            platform_name: linux-ppc64le
+          - platform: linux/s390x
+            platform_name: linux-s390x
         version:
           - latest
           - lua
@@ -75,7 +83,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v7
         with:
-          name: digests-${{ matrix.version }}-${{ matrix.platform }}
+          name: digests-${{ matrix.version }}-${{ matrix.platform_name }}
           path: /tmp/digests-${{ matrix.version }}/*
           if-no-files-found: error
           retention-days: 1
