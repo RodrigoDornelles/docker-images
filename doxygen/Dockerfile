@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS fetch
+FROM debian:bookworm-20260713-slim AS fetch
 
 ARG DOXYGEN_VERSION=Release_1_17_0
 ARG AWESOME_VERSION=v2.4.2
@@ -13,24 +13,21 @@ RUN curl -fsSL "https://github.com/jothepro/doxygen-awesome-css/archive/refs/tag
 RUN curl -fsSL "https://github.com/plantuml/plantuml/releases/download/$PLANTUML_VERSION/plantuml.jar" > /plantuml/plantuml.jar
 
 WORKDIR /doxygen-source
-RUN cmake -G "Unix Makefiles" . && make
+RUN cmake -G "Unix Makefiles" . && make -j$(nproc) && make install DESTDIR=/doxygen-root
 
-FROM debian:bookworm-slim
+FROM debian:bookworm-20260713-slim
 
 ENV DOXYGEN_AWESOME_PATH=/usr/local/share/doxygen-awesome-css
 ENV PLANTUML_JAR_PATH=/usr/share/plantuml
 
 COPY --from=fetch /plantuml /usr/share/plantuml
-COPY --from=fetch /doxygen-source /doxygen-source
+COPY --from=fetch /doxygen-root/usr/local /usr/local
 COPY --from=fetch /doxygen-awesome-css /doxygen-awesome-css
 
 RUN set -ex && \
     apt-get -y update && \
-    apt-get -y install cmake && \
     apt-get -y install make graphviz default-jre texlive-latex-extra && \
-    make install -C /doxygen-source && \
     make install -C /doxygen-awesome-css && \
-    apt-get -y remove cmake && \
     apt-get -y autoremove && \
     rm -Rf /doxygen-source && \
     rm -Rf /doxygen-awesome-css && \
@@ -60,4 +57,4 @@ RUN [ "${version}" != "lua" ] \
         && rm -Rf /doxygen-lua2dox \
         && rm -Rf /var/lib/apt/lists/* \
         && apt-get clean \
-)
+    )
