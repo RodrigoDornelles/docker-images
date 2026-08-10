@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-ENV FVM_VER 2.4.1
+ENV FVM_VER null
 ENV FVM_URL https://github.com/leoafarias/fvm/releases/download
 ENV FVM_DIR /opt/fvm
 ENV FVM_ARCH $([[ $(uname -m) == x86_64 ]] && echo x64 || echo arm64)
