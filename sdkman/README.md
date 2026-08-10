@@ -11,6 +11,7 @@
 ### Features ###
 
  * [fvm](https://fvm.app/)
+ * [nvm](https://github.com/nvm-sh/nvm)
  * [cmake](https://cmake.org/)
  * [sdkman](https://sdkman.io/)
  * [advmangager](https://developer.android.com/studio/command-line/avdmanager)
@@ -20,6 +21,7 @@
 
  * `ANDROID_HOME`
  * `FLUTTER_HOME`
+ * `NVM_DIR`
 
 ### Usage ###
 
@@ -40,4 +42,14 @@ sdk install java 17.0.9-oracle
 fei 3.13.9
 flutter pub get
 flutter build apk
+```
+
+#### Node.js ####
+
+```sh
+podman run --rm -v /tmp:/tmp -v $(pwd):/app -w /app rodrigodornelles/sdkman:latest
+nvm install 20
+nvm use 20
+npm install
+npm run build
 ```

@@ -54,3 +54,48 @@ jobs:
             --head "${{ steps.condition.outputs.should_open_pr }}" \
             --title "doxygen update [autocommit]" \
             --body "check latest updates"
+
+  sdkman:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update Dockerfile with latest releases
+        run: |
+          FVM_VERSION=$(curl -s https://api.github.com/repos/leoafarias/fvm/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+          NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+          sed -i "s/ENV FVM_VER .*/ENV FVM_VER $FVM_VERSION/" ./sdkman/Dockerfile
+          sed -i "s/ENV NVM_VER .*/ENV NVM_VER $NVM_VERSION/" ./sdkman/Dockerfile
+
+      - name: Commit to new branch
+        id: condition
+        run: |
+          git diff
+          branch="auto-$(git hash-object ./sdkman/Dockerfile | head -c 7)"
+
+          if ! git rev-parse --verify "$branch" > /dev/null 2>&1 && [ -n "$(git status -s)" ]; then
+            echo "should_open_pr=$branch" >> $GITHUB_OUTPUT
+            git config user.name "${{ secrets.GIT_USER_NAME}}"
+            git config user.email "${{ secrets.GIT_USER_MAIL}}"
+            git add ./sdkman/Dockerfile
+            git commit -m "build: automatic update sdkman"
+            git checkout -b $branch
+            git push --set-upstream origin $branch
+          else
+            echo "should_open_pr=false" >> $GITHUB_OUTPUT
+            echo "Dockerfile is up to date."
+          fi
+
+      - name: Open Pull Request
+        if: steps.condition.outputs.should_open_pr != 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.condition.outputs.should_open_pr }}" \
+            --title "sdkman update [autocommit]" \
+            --body "check latest updates"

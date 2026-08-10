@@ -19,17 +19,18 @@ echo -e "git config --global --add safe.directory \$FLUTTER_HOME\n" >> /tmp/bin/
 echo -e "flutter precache\nflutter config --no-analytics\ndart --disable-analytics" >> /tmp/bin/fei
 chmod +x /tmp/bin/fei
 
-# force execution of sdkman and bash terminal
+# force execution of sdkman, nvm and bash terminal
 if [[ ("$1" = 'sh' || "$1" = 'bash') && "$2" = "-c" ]]; then
     shift 2
-    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && ($@)"
+    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && source $NVM_DIR/nvm.sh && ($@)"
 elif [[ ("$1" = 'sh' || "$1" = 'bash') && $# -eq 2 && -f $2 ]]; then
     r=$(<"$2")
-    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && ($r)"
+    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && source $NVM_DIR/nvm.sh && ($r)"
 elif [ $# -gt 0 ]; then
-    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && ($*)"
+    bash -c "source /root/.bashrc && source $SDKMAN_DIR/bin/sdkman-init.sh && source $NVM_DIR/nvm.sh && ($*)"
 else
     source /root/.bashrc
     source $SDKMAN_DIR/bin/sdkman-init.sh
+    source $NVM_DIR/nvm.sh
     exec bash
 fi
