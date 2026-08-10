@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'texlive/*'
+      - '!texlive/README.md'
       - '.github/workflows/texlive.yml'
 
 env:

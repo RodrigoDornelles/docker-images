@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'doxygen/*'
+      - 'doxygen/**'
       - '!doxygen/README.md'
       - '.github/workflows/doxygen.yml'
 
@@ -17,6 +17,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
@@ -24,7 +25,6 @@ jobs:
           - linux/386
           - linux/amd64
           - linux/arm/v5
-          - linux/arm/v6
           - linux/arm/v7
           - linux/arm64/v8
           - linux/mips64le
@@ -35,86 +35,87 @@ jobs:
           - lua
 
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Docker meta
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY_IMAGE }}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push by digest
+
+      - name: Set artifact platform
+        id: artifact
+        run: |
+          echo "platform=${{ matrix.platform }}" | tr '/' '-' >> "$GITHUB_OUTPUT"
+
+      - name: Build and push by digest
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: ${{ env.CONTEXT }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           build-args: version=${{ matrix.version }}
-      -
-        name: Export digest
+
+      - name: Export digest
         run: |
           mkdir -p /tmp/digests-${{ matrix.version }}
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests-${{ matrix.version }}/${digest#sha256:}"
-      -
-        name: Upload digest
-        uses: actions/upload-artifact@v3
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v7
         with:
-          name: digests-${{ matrix.version }}
+          name: digests-${{ matrix.version }}-${{ steps.artifact.outputs.platform }}
           path: /tmp/digests-${{ matrix.version }}/*
           if-no-files-found: error
           retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
         version:
           - latest
           - lua
+
     needs:
       - build
+
     steps:
-      -
-        name: Download digests
-        uses: actions/download-artifact@v3
+      - name: Download digests
+        uses: actions/download-artifact@v5
         with:
-          name: digests-${{ matrix.version }}
+          pattern: digests-${{ matrix.version }}-*
           path: /tmp/digests-${{ matrix.version }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY_IMAGE }}
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Create manifest list and push
+
+      - name: Create manifest list and push
         working-directory: /tmp/digests-${{ matrix.version }}
         run: |
           docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${{ matrix.version }} $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)

@@ -5,6 +5,9 @@ ENV FVM_URL https://github.com/leoafarias/fvm/releases/download
 ENV FVM_DIR /opt/fvm
 ENV FVM_ARCH $([[ $(uname -m) == x86_64 ]] && echo x64 || echo arm64)
 ENV FLUTTER_HOME /tmp/flutter-fvm/default
+ENV NVM_VER 0.40.1
+ENV NVM_URL https://raw.githubusercontent.com/nvm-sh/nvm
+ENV NVM_DIR /opt/nvm
 ENV SDKMAN_URL https://get.sdkman.io
 ENV ANDROID_URL https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
 ENV ANDROID_HOME /opt/android-sdk
@@ -15,6 +18,7 @@ ENV PATH $PATH:$FVM_DIR:$FLUTTER_HOME/bin/
 ENV TMPDIR_PATH /tmp/android:/tmp/sdkman-tmp:/tmp/sdkman-candidates
 ENV TMPDIR_PATH $TMPDIR_PATH:/tmp/flutter-pub:/tmp/flutter-fvm:/tmp/flutter-home
 ENV TMPDIR_PATH $TMPDIR_PATH:/tmp/dart-home:/tmp/dart-tool
+ENV TMPDIR_PATH $TMPDIR_PATH:/tmp/nvm-versions:/tmp/nvm-cache
 ENV TMPDIR_PATH $TMPDIR_PATH:/tmp/bin
 
 RUN bash -c "source /root/.bashrc \
@@ -34,6 +38,10 @@ RUN bash -c "source /root/.bashrc \
     && rm android-sdk-tools.zip \
     && (yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME > /dev/null) \
     && sdk uninstall java 17.0.9-oracle --force \
+    && mkdir -p $NVM_DIR \
+    && curl -o- ${NVM_URL}/v${NVM_VER}/install.sh | bash \
+    && rm -Rf $NVM_DIR/.cache $NVM_DIR/versions \
+    && ln -s /tmp/nvm-cache $NVM_DIR/.cache \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.android $SDKMAN_DIR/candidates $SDKMAN_DIR/tmp \
     && ln -s /tmp/android /root/.android \
@@ -44,6 +52,7 @@ RUN bash -c "source /root/.bashrc \
     && ln -s /tmp/flutter-fvm /root/fvm \
     && ln -s /tmp/dart-tool /root/.dart-tool \
     && ln -s /tmp/dart-home /root/.dart \
+    && ln -s /tmp/nvm-versions $NVM_DIR/versions \
     "
 
 COPY ./docker-entrypoint.sh /entrypoint.sh

@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'ziglang/*'
+      - '!ziglang/README.md'
       - '.github/workflows/ziglang.yml'
 
 env:
