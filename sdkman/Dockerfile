@@ -1,11 +1,11 @@
 FROM debian:bullseye-slim
 
-ENV FVM_VER 2.4.1
+ENV FVM_VER 4.3.1
 ENV FVM_URL https://github.com/leoafarias/fvm/releases/download
 ENV FVM_DIR /opt/fvm
 ENV FVM_ARCH $([[ $(uname -m) == x86_64 ]] && echo x64 || echo arm64)
 ENV FLUTTER_HOME /tmp/flutter-fvm/default
-ENV NVM_VER 0.40.1
+ENV NVM_VER 0.40.7
 ENV NVM_URL https://raw.githubusercontent.com/nvm-sh/nvm
 ENV NVM_DIR /opt/nvm
 ENV SDKMAN_URL https://get.sdkman.io
