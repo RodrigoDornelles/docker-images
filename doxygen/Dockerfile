@@ -1,7 +1,7 @@
 FROM debian:bookworm-20260713-slim AS fetch
 
 ARG DOXYGEN_VERSION=Release_1_18_0
-ARG AWESOME_VERSION=v2.4.2
+ARG AWESOME_VERSION=v2.5.0
 ARG PLANTUML_VERSION=v1.2026.8
 
 RUN apt-get -y update && apt-get -y install cmake g++ gcc python3 flex bison curl
